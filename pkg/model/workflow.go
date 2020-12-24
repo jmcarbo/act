@@ -54,6 +54,69 @@ func (w *Workflow) On() []string {
 	return nil
 }
 
+// On events for the workflow
+func (w *Workflow) OnPaths(targetEvent string) []string {
+
+	switch w.RawOn.Kind {
+	case yaml.ScalarNode:
+		var val string
+		err := w.RawOn.Decode(&val)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return []string{"**"}
+	case yaml.SequenceNode:
+		var val []string
+		err := w.RawOn.Decode(&val)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return []string{"**"}
+	case yaml.MappingNode:
+		var val map[string]interface{}
+		err := w.RawOn.Decode(&val)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for k,v := range val {
+      if k == targetEvent {
+        a, ok := v.(map[string]interface{})
+		    if !ok {
+			    log.Fatal("Error casting on event")
+		    }
+        v2, okPaths := a["paths"]
+        if okPaths {
+          as, ok := v2.([]interface{})
+		      if !ok {
+			      log.Fatalf("Error casting on event paths is not array of strings %+v\n", v2)
+		      }
+          var ass []string
+          for _,s := range as {
+            ass = append(ass, s.(string))
+          }
+          return ass
+        } else {
+          v2, okPaths := a["paths-ignore"]
+          if okPaths {
+            as, ok := v2.([]interface{})
+            if !ok {
+              log.Fatalf("Error casting on event paths-ignore is not array of strings %+v\n", v2)
+            }
+            var ass []string
+            for _,s := range as {
+              ass = append(ass, s.(string))
+            }
+            return ass
+          }
+        }
+		    return []string{"**"}
+      }
+		}
+		return []string{} 
+	}
+	return []string{"**"}
+}
+
 // Job is the structure of one job in a workflow
 type Job struct {
 	Name           string                    `yaml:"name"`
