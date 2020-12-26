@@ -318,3 +318,40 @@ func NewGitCloneExecutor(input NewGitCloneExecutorInput) Executor {
 		return nil
 	}
 }
+
+
+func FindChangedFiles(path string) ([]string, error) {
+  var files []string
+
+  // Get root folder
+  gitPath, err := findGitDirectory(path)
+  if err != nil {
+    log.Errorf("Unable to find git directory")
+    return files, err
+  }
+  newPath := strings.TrimRight(gitPath, ".git")
+
+  // Open git repository
+	r, err := git.PlainOpen(newPath)
+  if err != nil {
+    log.Errorf("Unable to find github repository")
+    return files, err
+  }
+  // Get Worktree
+  wt, err := r.Worktree()
+  if err != nil {
+    log.Errorf("Unable to find github worktree")
+    return files, err
+  }
+
+  st, err := wt.Status()
+  if err != nil {
+    log.Errorf("Unable to find github worktree status")
+    return files, err
+  }
+
+  for f, _ := range st {
+    files = append(files, f)
+  }
+  return files, nil
+}

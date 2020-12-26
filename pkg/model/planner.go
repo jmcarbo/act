@@ -9,6 +9,8 @@ import (
 	"sort"
 
 	"github.com/pkg/errors"
+	"github.com/nektos/act/pkg/common"
+  "github.com/bmatcuk/doublestar/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -96,12 +98,13 @@ func NewWorkflowPlanner(path string) (WorkflowPlanner, error) {
 			f.Close()
 		}
 	}
-
+  wp.path = path
 	return wp, nil
 }
 
 type workflowPlanner struct {
 	workflows []*Workflow
+  path string
 }
 
 // PlanEvent builds a new list of runs to execute in parallel for an event name
@@ -114,7 +117,35 @@ func (wp *workflowPlanner) PlanEvent(eventName string) *Plan {
 	for _, w := range wp.workflows {
 		for _, e := range w.On() {
 			if e == eventName {
-				plan.mergeStages(createStages(w, w.GetJobIDs()...))
+        // check for event paths or paths-ignore
+        merge := false
+        targetPaths := w.OnPaths(eventName)
+        // there are target paths
+        if len(targetPaths) > 0 {
+          cf, _ :=common.FindChangedFiles(wp.path)
+          for _, tp := range targetPaths {
+            for _, tf := range cf {
+              mtp := tp
+              negate := false
+              if len(tp)>0 && tp[0]=='!' {
+                mtp = tp[1:]
+                negate = true
+              }
+              if m, err := doublestar.PathMatch(mtp, tf); (m != negate) && err == nil {
+                merge = true
+                break
+              }
+            }
+            if merge == true {
+              break
+            }
+          }
+        } else {
+          merge = true
+        }
+        if merge {
+          plan.mergeStages(createStages(w, w.GetJobIDs()...))
+        }
 			}
 		}
 	}

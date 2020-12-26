@@ -8,6 +8,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/Microsoft/hcsshim v0.8.6 // indirect
 	github.com/andreaskoch/go-fswatch v1.0.0
+	github.com/bmatcuk/doublestar/v2 v2.0.4 // indirect
 	github.com/containerd/containerd v1.3.3 // indirect
 	github.com/containerd/continuity v0.0.0-20190426062206-aaeac12a7ffc // indirect
 	github.com/docker/cli v0.0.0-20200617172703-0ed913b885c8

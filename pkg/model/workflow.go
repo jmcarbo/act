@@ -64,14 +64,14 @@ func (w *Workflow) OnPaths(targetEvent string) []string {
 		if err != nil {
 			log.Fatal(err)
 		}
-		return []string{"**"}
+		return []string{}
 	case yaml.SequenceNode:
 		var val []string
 		err := w.RawOn.Decode(&val)
 		if err != nil {
 			log.Fatal(err)
 		}
-		return []string{"**"}
+		return []string{}
 	case yaml.MappingNode:
 		var val map[string]interface{}
 		err := w.RawOn.Decode(&val)
@@ -104,15 +104,15 @@ func (w *Workflow) OnPaths(targetEvent string) []string {
             }
             var ass []string
             for _,s := range as {
-              ass = append(ass, s.(string))
+              ass = append(ass, "!"+s.(string))
             }
             return ass
           }
         }
-		    return []string{"**"}
+		    return []string{}
       }
 		}
-		return []string{} 
+		return []string{}
 	}
 	return []string{"**"}
 }

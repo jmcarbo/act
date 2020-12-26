@@ -24,7 +24,7 @@ jobs:
 
 	assert.Len(t, workflow.On(), 1)
 	assert.Contains(t, workflow.On(), "push")
-	assert.Contains(t, workflow.OnPaths("push"), "**")
+	assert.Empty(t, workflow.OnPaths("push"))
 }
 
 func TestReadWorkflow_ListEvent(t *testing.T) {
@@ -45,8 +45,8 @@ jobs:
 	assert.Len(t, workflow.On(), 2)
 	assert.Contains(t, workflow.On(), "push")
 	assert.Contains(t, workflow.On(), "pull_request")
-	assert.Contains(t, workflow.OnPaths("push"), "**")
-	assert.Contains(t, workflow.OnPaths("pull_request"), "**")
+	assert.Empty(t, workflow.OnPaths("push"))
+	assert.Empty(t, workflow.OnPaths("pull_request"))
 }
 
 func TestReadWorkflow_MapEvent(t *testing.T) {
@@ -72,8 +72,8 @@ jobs:
 	assert.Len(t, workflow.On(), 2)
 	assert.Contains(t, workflow.On(), "push")
 	assert.Contains(t, workflow.On(), "pull_request")
-	assert.Contains(t, workflow.OnPaths("push"), "**")
-	assert.Contains(t, workflow.OnPaths("pull_request"), "**")
+	assert.Empty(t, workflow.OnPaths("push"))
+	assert.Empty(t, workflow.OnPaths("pull_request"))
 }
 
 func TestReadWorkflow_MapEventPaths(t *testing.T) {
@@ -106,7 +106,7 @@ jobs:
 	assert.Contains(t, workflow.OnPaths("push"), "a*")
 	assert.Contains(t, workflow.OnPaths("push"), "b*")
 	assert.Contains(t, workflow.OnPaths("push"), "!c*")
-	assert.Contains(t, workflow.OnPaths("pull_request"), "**")
+	assert.Empty(t, workflow.OnPaths("pull_request"))
 }
 
 func TestReadWorkflow_MapEventPathsIgnore(t *testing.T) {
@@ -136,10 +136,10 @@ jobs:
 	assert.Len(t, workflow.On(), 2)
 	assert.Contains(t, workflow.On(), "push")
 	assert.Contains(t, workflow.On(), "pull_request")
-	assert.Contains(t, workflow.OnPaths("push"), "a*")
-	assert.Contains(t, workflow.OnPaths("push"), "b*")
-	assert.Contains(t, workflow.OnPaths("push"), "c*")
-	assert.Contains(t, workflow.OnPaths("pull_request"), "**")
+	assert.Contains(t, workflow.OnPaths("push"), "!a*")
+	assert.Contains(t, workflow.OnPaths("push"), "!b*")
+	assert.Contains(t, workflow.OnPaths("push"), "!c*")
+	assert.Empty(t, workflow.OnPaths("pull_request"))
 }
 func TestReadWorkflow_StringContainer(t *testing.T) {
 	yaml := `
